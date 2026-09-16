@@ -27,7 +27,7 @@ flowchart LR
 - **Orchestration** : Airflow (Docker, image versionnée)
 - **Restitution** : Power BI
 
-*(Volet cloud AWS explicitement hors périmètre v1 — voir [ADR-0001](docs/adr/0001-postgres-local-vs-cloud-demblee.md))*
+*(Volet cloud AWS explicitement hors périmètre v1, voir [ADR-0001](docs/adr/0001-postgres-local-vs-cloud-demblee.md))*
 
 ## Démarrage
 
@@ -41,8 +41,9 @@ docker compose up
 
 - Phases terminées : 0/4
 - Tests dbt : 0
-- ADR rédigés : 1
+- ADR rédigés : 2
 
 ## Documentation approfondie
 
-- [ADR-0001 — Choix de PostgreSQL local plutôt qu'un socle cloud d'emblée](docs/adr/0001-postgres-local-vs-cloud-demblee.md)
+- [ADR-0001 : Choix de PostgreSQL local plutôt qu'un socle cloud d'emblée](docs/adr/0001-postgres-local-vs-cloud-demblee.md)
+- [ADR-0002 : Périmètre volontairement minimal de 6 tables](docs/adr/0002-perimetre-six-tables.md)
