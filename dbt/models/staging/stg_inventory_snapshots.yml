@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: stg_inventory_snapshots
+    description: Relevés de stock quotidiens nettoyés, en amont de fct_inventory_snapshot.
+    columns:
+      - name: snapshot_id
+        description: Identifiant technique du relevé.
+        tests:
+          - not_null
+          - unique
+      - name: part_id
+        description: Pièce concernée.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_parts')
+                field: part_id
+      - name: stock_quantity
+        description: Stock réel ce jour-là. Ne peut pas être négatif (plafonné à 0 par le générateur).
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: true
+      - name: safety_stock
+        description: Seuil de sécurité pour cette pièce.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: true

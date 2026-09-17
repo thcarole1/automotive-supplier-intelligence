@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: stg_purchase_orders
+    description: Commandes fournisseurs nettoyées, en amont de fct_purchase_order_line.
+    columns:
+      - name: po_id
+        description: Identifiant technique de la commande.
+        tests:
+          - not_null
+          - unique
+      - name: po_number
+        description: Numéro de commande métier.
+        tests:
+          - not_null
+          - unique
+      - name: supplier_id
+        description: Fournisseur de la commande.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_suppliers')
+                field: supplier_id
+      - name: part_id
+        description: Pièce commandée.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_parts')
+                field: part_id
+      - name: quantity
+        description: Quantité commandée. Doit être strictement positive (anomalies détectées ici si non).
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              inclusive: true

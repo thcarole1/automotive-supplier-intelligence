@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: suppliers
+      - name: parts
+      - name: purchase_orders
+      - name: deliveries
+      - name: quality_incidents
+      - name: inventory_snapshots
