@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: stg_parts
+    description: Pièces nettoyées, en amont de dim_part.
+    columns:
+      - name: part_id
+        description: Identifiant technique de la pièce.
+        tests:
+          - not_null
+          - unique
+      - name: part_code
+        description: Code métier de la pièce.
+        tests:
+          - not_null
+          - unique
+      - name: family
+        description: Famille de composants.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['SUSPENSION', 'ELECTRIC_POWERTRAIN']
+      - name: criticality
+        description: Niveau de criticité de la pièce.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['LOW', 'MEDIUM', 'HIGH']

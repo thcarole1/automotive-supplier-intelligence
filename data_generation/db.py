@@ -41,7 +41,8 @@ def insert_and_get_ids(
 ) -> list[int]:
     """
     Insère une liste d'enregistrements (dictionnaires) dans une table
-    et retourne les identifiants générés par PostgreSQL, dans l'ordre d'insertion.
+    du schéma raw et retourne les identifiants générés par PostgreSQL,
+    dans l'ordre d'insertion.
     """
     if not records:
         return []
@@ -50,7 +51,7 @@ def insert_and_get_ids(
     columns_sql = ", ".join(columns)
     placeholders_sql = ", ".join(f"%({col})s" for col in columns)
     query = (
-        f"INSERT INTO {table} ({columns_sql}) "
+        f"INSERT INTO raw.{table} ({columns_sql}) "
         f"VALUES ({placeholders_sql}) "
         f"RETURNING {id_column}"
     )

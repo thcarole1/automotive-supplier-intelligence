@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_quality_incidents
+    description: Incidents qualité nettoyés, en amont de fct_quality_incident.
+    columns:
+      - name: incident_id
+        description: Identifiant technique de l'incident.
+        tests:
+          - not_null
+          - unique
+      - name: supplier_id
+        description: Fournisseur concerné par l'incident.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_suppliers')
+                field: supplier_id
+      - name: part_id
+        description: Pièce concernée par l'incident.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_parts')
+                field: part_id
+      - name: po_id
+        description: Commande d'origine, si traçable (nullable, cas des audits qualité génériques).
+        tests:
+          - relationships:
+              arguments:
+                to: ref('stg_purchase_orders')
+                field: po_id
+              config:
+                where: "po_id IS NOT NULL"
+      - name: severity
+        description: Gravité de l'incident.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['MINOR', 'MAJOR', 'CRITICAL']
+      - name: quantity_affected
+        description: Nombre de pièces concernées par l'incident.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                inclusive: true

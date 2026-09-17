@@ -41,14 +41,15 @@ docker compose up
 
 - Phases terminées : 0/4
 - Tests dbt : 0
-- ADR rédigés : 2
+- ADR rédigés : 3
 
 ## Pistes d'extension (hors périmètre v1)
 
 - **Consommation multi-usines par pays** : le modèle de stock actuel simule une consommation quotidienne globale par pièce, sans distinction géographique. Une évolution réaliste consisterait à répartir la consommation entre plusieurs usines localisées dans différents pays, avec des cadences propres à chaque site. Nécessiterait l'introduction d'une entité plant/usine, aujourd'hui absente des données sources.
-- **dim_plant** : le cahier des charges initial prévoit cette dimension dans les marts dbt, mais aucune des 6 tables sources ne contient d'information sur les usines. Ce point sera à trancher lors de la conception des marts (soit ajout d'une table plants en amont, soit retrait de dim_plant du périmètre, à documenter par ADR le cas échéant).
+- **dim_plant** : initialement prévue dans le cahier des charges, cette dimension a été retirée du périmètre v1, faute de table source portant une notion d'usine (voir [ADR-0003](docs/adr/0003-retrait-dim-plant.md)). Elle pourrait revenir si la piste multi-usines ci-dessus est concrétisée.
 
 ## Documentation approfondie
 
 - [ADR-0001 : Choix de PostgreSQL local plutôt qu'un socle cloud d'emblée](docs/adr/0001-postgres-local-vs-cloud-demblee.md)
 - [ADR-0002 : Périmètre volontairement minimal de 6 tables](docs/adr/0002-perimetre-six-tables.md)
+- [ADR-0003 : Retrait de dim_plant du périmètre v1](docs/adr/0003-retrait-dim-plant.md)

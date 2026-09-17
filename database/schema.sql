@@ -1,7 +1,11 @@
 -- ASIP : schéma PostgreSQL (raw)
+-- Les données brutes vivent dans un schéma dédié "raw", séparé du
+-- schéma "public" par défaut, pour une séparation claire des couches.
 -- Ordre de création respectant les dépendances de clés étrangères
 
-CREATE TABLE suppliers (
+CREATE SCHEMA IF NOT EXISTS raw;
+
+CREATE TABLE raw.suppliers (
     supplier_id     SERIAL PRIMARY KEY,
     supplier_code   VARCHAR(20) UNIQUE NOT NULL,
     supplier_name   VARCHAR(150) NOT NULL,
@@ -14,7 +18,7 @@ CREATE TABLE suppliers (
     created_at      TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE parts (
+CREATE TABLE raw.parts (
     part_id         SERIAL PRIMARY KEY,
     part_code       VARCHAR(20) UNIQUE NOT NULL,
     part_name       VARCHAR(150) NOT NULL,
@@ -27,11 +31,11 @@ CREATE TABLE parts (
     created_at      TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE purchase_orders (
+CREATE TABLE raw.purchase_orders (
     po_id                     SERIAL PRIMARY KEY,
     po_number                 VARCHAR(20) UNIQUE NOT NULL,
-    supplier_id               INTEGER NOT NULL REFERENCES suppliers(supplier_id),
-    part_id                   INTEGER NOT NULL REFERENCES parts(part_id),
+    supplier_id               INTEGER NOT NULL REFERENCES raw.suppliers(supplier_id),
+    part_id                   INTEGER NOT NULL REFERENCES raw.parts(part_id),
     order_date                DATE NOT NULL,
     requested_delivery_date   DATE NOT NULL,
     confirmed_delivery_date   DATE,
@@ -41,9 +45,9 @@ CREATE TABLE purchase_orders (
     created_at                TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE deliveries (
+CREATE TABLE raw.deliveries (
     delivery_id             SERIAL PRIMARY KEY,
-    po_id                   INTEGER NOT NULL REFERENCES purchase_orders(po_id),
+    po_id                   INTEGER NOT NULL REFERENCES raw.purchase_orders(po_id),
     shipment_date           DATE,
     expected_delivery_date  DATE NOT NULL,
     actual_delivery_date    DATE,
@@ -51,11 +55,11 @@ CREATE TABLE deliveries (
     created_at               TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE quality_incidents (
+CREATE TABLE raw.quality_incidents (
     incident_id         SERIAL PRIMARY KEY,
-    supplier_id         INTEGER NOT NULL REFERENCES suppliers(supplier_id),
-    part_id              INTEGER NOT NULL REFERENCES parts(part_id),
-    po_id                INTEGER REFERENCES purchase_orders(po_id),
+    supplier_id         INTEGER NOT NULL REFERENCES raw.suppliers(supplier_id),
+    part_id              INTEGER NOT NULL REFERENCES raw.parts(part_id),
+    po_id                INTEGER REFERENCES raw.purchase_orders(po_id),
     incident_date        DATE NOT NULL,
     incident_type        VARCHAR(30) NOT NULL,
     severity             VARCHAR(10) NOT NULL
@@ -64,9 +68,9 @@ CREATE TABLE quality_incidents (
     created_at            TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE inventory_snapshots (
+CREATE TABLE raw.inventory_snapshots (
     snapshot_id      SERIAL PRIMARY KEY,
-    part_id           INTEGER NOT NULL REFERENCES parts(part_id),
+    part_id           INTEGER NOT NULL REFERENCES raw.parts(part_id),
     snapshot_date     DATE NOT NULL,
     stock_quantity    INTEGER NOT NULL,
     safety_stock      INTEGER NOT NULL,

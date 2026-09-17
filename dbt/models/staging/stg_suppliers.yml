@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_suppliers
+    description: Fournisseurs nettoyés, en amont de dim_supplier (SCD2 en aval).
+    columns:
+      - name: supplier_id
+        description: Identifiant technique du fournisseur.
+        tests:
+          - not_null
+      - name: supplier_code
+        description: Code métier du fournisseur (peut apparaître en double, doublons volontaires du générateur).
+        tests:
+          - not_null
+      - name: risk_profile
+        description: Profil de risque du fournisseur.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['LOW', 'MEDIUM', 'HIGH']

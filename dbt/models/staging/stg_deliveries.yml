@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: stg_deliveries
+    description: Livraisons nettoyées, en amont de fct_delivery.
+    columns:
+      - name: delivery_id
+        description: Identifiant technique de la livraison.
+        tests:
+          - not_null
+          - unique
+      - name: po_id
+        description: Commande associée.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_purchase_orders')
+                field: po_id
+      - name: quantity_delivered
+        description: Quantité livrée (peut être partielle).
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                inclusive: true
+    tests:
+      # severity: warn car le générateur de données injecte volontairement
+      # des dates incohérentes sur ~4 % des livraisons (voir anomalies.py,
+      # ANOMALY_RATE). Un échec bloquant ici casserait le pipeline Airflow
+      # pour un comportement attendu et documenté, pas un vrai problème.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "actual_delivery_date >= shipment_date"
+          config:
+            where: "actual_delivery_date IS NOT NULL AND shipment_date IS NOT NULL"
+            severity: warn
