@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: int_deliveries_enriched
+    description: >
+      Livraisons enrichies du po_id/supplier_id/part_id de la commande associée,
+      avec le délai réel de livraison (delay_days) et un indicateur de ponctualité
+      (is_on_time), base du futur calcul OTD.
+
+  - name: int_purchase_orders_enriched
+    description: >
+      Commandes enrichies des attributs fournisseur (risk_profile, country) et
+      pièce (family, subcategory, criticality), avec le montant total de la ligne
+      (line_total), pour simplifier les calculs de facts et KPI en aval.
