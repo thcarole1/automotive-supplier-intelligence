@@ -19,6 +19,21 @@ flowchart LR
     E -. orchestre .-> C
 ```
 
+## Données générées
+
+Le générateur Python (Faker, seed fixe) produit un jeu de données reproductible sur la période 2023-01-01 à 2025-12-31 :
+
+| Table | Volume |
+|---|---|
+| `suppliers` | 26 (dont doublons volontaires) |
+| `parts` | 40 |
+| `purchase_orders` | 2 000 |
+| `deliveries` | 2 307 (dont livraisons partielles) |
+| `quality_incidents` | 162 |
+| `inventory_snapshots` | 43 840 |
+
+Anomalies injectées volontairement (~4 % du volume) : doublons fournisseurs, variantes orthographiques de noms, dates incohérentes, prix aberrants, valeurs manquantes. Détectées par les tests dbt (voir le graphe de lignage ci-dessous).
+
 ## Modèle de données (star schema)
 
 3 dimensions (dont `dim_supplier` avec historisation SCD2) et 4 tables de faits, obtenues via un pipeline dbt en 3 couches (staging → intermediate → marts).
@@ -76,6 +91,20 @@ erDiagram
 ```
 
 `supplier_key` (et non `supplier_id`) est utilisé comme clé étrangère dans les faits : c'est la clé de version SCD2, qui pointe vers la version du fournisseur active à la date du fait (voir [ADR-0004](docs/adr/0004-fallback-scd2-facts.md)).
+
+### Documentation dbt et graphe de lignage
+
+dbt génère une documentation interactive avec un graphe de lignage complet (raw → staging → intermediate → marts), consultable en local :
+
+```bash
+cd dbt
+dbt docs generate
+dbt docs serve
+```
+
+Le graphe de lignage réel du projet (généré à partir des 15 modèles et de leurs dépendances) :
+
+![Graphe de lignage dbt](docs/img/dbt-lineage-graph.png)
 
 ## Stack
 
