@@ -19,7 +19,66 @@ flowchart LR
     E -. orchestre .-> C
 ```
 
+## Modèle de données (star schema)
+
+3 dimensions (dont `dim_supplier` avec historisation SCD2) et 4 tables de faits, obtenues via un pipeline dbt en 3 couches (staging → intermediate → marts).
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#e3f2fd', 'primaryTextColor': '#0d1b2a', 'primaryBorderColor': '#1565c0', 'lineColor': '#333333', 'tertiaryColor': '#fff3e0'}}}%%
+erDiagram
+    dim_supplier ||--o{ fct_purchase_order_line : "supplier_key"
+    dim_supplier ||--o{ fct_delivery : "supplier_key"
+    dim_supplier ||--o{ fct_quality_incident : "supplier_key"
+    dim_part ||--o{ fct_purchase_order_line : "part_id"
+    dim_part ||--o{ fct_quality_incident : "part_id"
+    dim_part ||--o{ fct_inventory_snapshot : "part_id"
+    fct_purchase_order_line ||--o{ fct_delivery : "po_id"
+    dim_date ||--o{ fct_purchase_order_line : "order_date"
+    dim_date ||--o{ fct_inventory_snapshot : "snapshot_date"
+
+    dim_supplier {
+        string supplier_key PK
+        int supplier_id
+        string risk_profile
+        boolean is_current
+    }
+    dim_part {
+        int part_id PK
+        string family
+        string criticality
+    }
+    dim_date {
+        date date_day PK
+    }
+    fct_purchase_order_line {
+        int po_id PK
+        string supplier_key FK
+        int part_id FK
+        numeric line_total
+    }
+    fct_delivery {
+        int delivery_id PK
+        int po_id FK
+        string supplier_key FK
+        int delay_days
+    }
+    fct_quality_incident {
+        int incident_id PK
+        string supplier_key FK
+        int part_id FK
+        string severity
+    }
+    fct_inventory_snapshot {
+        int snapshot_id PK
+        int part_id FK
+        boolean is_below_safety_stock
+    }
+```
+
+`supplier_key` (et non `supplier_id`) est utilisé comme clé étrangère dans les faits : c'est la clé de version SCD2, qui pointe vers la version du fournisseur active à la date du fait (voir [ADR-0004](docs/adr/0004-fallback-scd2-facts.md)).
+
 ## Stack
+
 
 - **Génération de données** : Python, Faker (seed fixe, reproductible)
 - **Stockage** : PostgreSQL (Docker)
