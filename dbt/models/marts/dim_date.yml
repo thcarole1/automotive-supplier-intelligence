@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: Dimension calendaire, générée sur la plage 2023-01-01 à 2025-12-31.
+    columns:
+      - name: date_day
+        description: Date du jour, grain journalier.
+        tests:
+          - not_null
+          - unique

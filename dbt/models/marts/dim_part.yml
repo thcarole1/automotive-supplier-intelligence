@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: dim_part
+    description: Dimension pièce, une ligne par pièce (pas de SCD2, attributs jugés stables).
+    columns:
+      - name: part_id
+        description: Identifiant technique de la pièce, clé de la dimension.
+        tests:
+          - not_null
+          - unique
