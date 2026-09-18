@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: dim_supplier
+    description: >
+      Dimension fournisseur avec historisation SCD2 (via dbt snapshot) sur
+      risk_profile et is_active. supplier_key identifie une version précise ;
+      supplier_id identifie l'entité fournisseur stable à travers ses versions.
+    columns:
+      - name: supplier_key
+        description: Clé technique de la version (une ligne par version du fournisseur).
+        tests:
+          - not_null
+          - unique
+      - name: supplier_id
+        description: Identifiant stable du fournisseur, à travers ses versions.
+        tests:
+          - not_null
+      - name: is_current
+        description: Vrai si cette version est la version actuellement valide.
+        tests:
+          - not_null
