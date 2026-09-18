@@ -35,5 +35,6 @@ models:
         tests:
           - not_null
           - dbt_utils.accepted_range:
-              min_value: 1
-              inclusive: true
+              arguments:
+                min_value: 1
+                inclusive: true
