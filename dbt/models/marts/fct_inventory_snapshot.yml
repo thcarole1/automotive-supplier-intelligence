@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: fct_inventory_snapshot
+    description: >
+      Un relevé de stock par pièce et par jour. is_below_safety_stock signale
+      un risque de rupture, base du calcul Days of Supply.
+    columns:
+      - name: snapshot_id
+        description: Identifiant du relevé, grain de la table de faits.
+        tests:
+          - not_null
+          - unique
+      - name: part_id
+        description: Pièce concernée.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_part')
+                field: part_id

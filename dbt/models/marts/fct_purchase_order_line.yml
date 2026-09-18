@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: fct_purchase_order_line
+    description: >
+      Une ligne par commande fournisseur. supplier_key pointe vers la version
+      du fournisseur active à order_date (SCD2), avec fallback vers la version
+      courante si aucune correspondance temporelle (voir ADR-0004).
+    columns:
+      - name: po_id
+        description: Identifiant de la commande, grain de la table de faits.
+        tests:
+          - not_null
+          - unique
+      - name: supplier_key
+        description: Version du fournisseur active à la date de commande (ou version courante en fallback).
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_supplier')
+                field: supplier_key
+      - name: part_id
+        description: Pièce commandée.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_part')
+                field: part_id

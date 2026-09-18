@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: fct_delivery
+    description: >
+      Une ligne par livraison (une commande peut avoir plusieurs livraisons
+      partielles). supplier_key suit la même logique de fallback SCD2 que
+      fct_purchase_order_line (voir ADR-0004).
+    columns:
+      - name: delivery_id
+        description: Identifiant de la livraison, grain de la table de faits.
+        tests:
+          - not_null
+          - unique
+      - name: po_id
+        description: Commande associée.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_purchase_order_line')
+                field: po_id
+      - name: supplier_key
+        description: Version du fournisseur active à la date de livraison attendue (ou version courante en fallback).
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_supplier')
+                field: supplier_key
