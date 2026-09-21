@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: kpi_part_days_of_supply
+    description: >
+      Days of Supply par pièce (stock actuel / consommation quotidienne
+      moyenne réelle, reconstituée à partir du bilan stock initial + reçu -
+      final sur toute la période observée, indépendamment de toute constante
+      de configuration du générateur).
+    columns:
+      - name: part_id
+        description: Identifiant de la pièce, grain de ce KPI.
+        tests:
+          - not_null
+          - unique
+      - name: days_of_supply
+        description: Nombre de jours de couverture de stock restants au dernier relevé connu.
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: true
