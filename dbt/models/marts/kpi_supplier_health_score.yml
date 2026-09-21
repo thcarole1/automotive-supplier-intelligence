@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: kpi_supplier_health_score
+    description: >
+      Score composite 0-100 par fournisseur, combinant OTD pondéré par
+      criticité des pièces (int_supplier_otd_by_criticality) et le classement
+      relatif sur PPM et variabilité du lead time (int_supplier_risk_ranking).
+      Pondérations configurables via dbt_project.yml
+      (health_score_criticality_weights, health_score_kpi_weights).
+    columns:
+      - name: supplier_id
+        description: Identifiant du fournisseur, grain de ce KPI.
+        tests:
+          - not_null
+          - unique
+      - name: health_score
+        description: Score composite final, de 0 (pire) à 100 (meilleur).
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+                inclusive: true

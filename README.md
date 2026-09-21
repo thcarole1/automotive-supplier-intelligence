@@ -106,6 +106,35 @@ Le graphe de lignage réel du projet (généré à partir des 15 modèles et de 
 
 ![Graphe de lignage dbt](docs/img/dbt-lineage-graph.png)
 
+## KPI calculés
+
+5 indicateurs métier, calculés par des modèles dbt dédiés (`models/marts/kpi_*.sql`) : OTD, PPM qualité, lead time moyen et variabilité (par fournisseur), Days of Supply (par pièce), et un Supplier Health Score composite.
+
+### Supplier Health Score, en deux étapes
+
+Le score combine deux niveaux de pondération, tous deux configurables sans toucher au SQL (`dbt_project.yml`, variables `health_score_criticality_weights` et `health_score_kpi_weights`) :
+
+1. **L'OTD est d'abord pondéré par criticité des pièces** : un retard sur une pièce critique (HIGH) pèse plus lourd qu'un retard sur une pièce secondaire (LOW).
+2. **Ce résultat est ensuite combiné avec le PPM et la variabilité du lead time** (tous deux classés par rang relatif entre fournisseurs, pour rester comparables), afin d'obtenir le score final sur 100.
+
+```mermaid
+flowchart TD
+    A1[OTD pièces LOW] --> C1
+    A2[OTD pièces MEDIUM] --> C1
+    A3[OTD pièces HIGH] --> C1
+    C1([otd_weighted_by_criticality<br/>pondéré 20% / 30% / 50%])
+
+    C1 --> D
+    B1[PPM classé entre fournisseurs] --> D
+    B2[Variabilité du lead time classée] --> D
+    D([health_score sur 100<br/>pondéré 40% / 40% / 20%])
+
+    classDef inputStyle fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px,color:#212121
+    classDef resultStyle fill:#eef2f7,stroke:#5c7a99,stroke-width:1px,color:#212121
+    class A1,A2,A3,B1,B2 inputStyle
+    class C1,D resultStyle
+```
+
 ## Stack
 
 

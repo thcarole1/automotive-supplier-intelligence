@@ -12,3 +12,15 @@ models:
       Commandes enrichies des attributs fournisseur (risk_profile, country) et
       pièce (family, subcategory, criticality), avec le montant total de la ligne
       (line_total), pour simplifier les calculs de facts et KPI en aval.
+
+  - name: int_supplier_otd_by_criticality
+    description: >
+      OTD par fournisseur, calculé séparément par criticité de pièce (LOW/MEDIUM/HIGH)
+      puis recombiné en une seule valeur pondérée via la variable
+      health_score_criticality_weights (dbt_project.yml). Base du Supplier Health Score.
+
+  - name: int_supplier_risk_ranking
+    description: >
+      Classement relatif des fournisseurs sur PPM et variabilité du lead time,
+      via PERCENT_RANK inversé (0 = pire, 1 = meilleur), pour ramener ces deux
+      métriques d'échelles différentes sur [0, 1]. Base du Supplier Health Score.

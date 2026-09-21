@@ -34,3 +34,15 @@ models:
       +materialized: view
     marts:
       +materialized: table
+
+# Pondération du Supplier Health Score par criticité de pièce.
+# Modifiable ici sans toucher au SQL des modèles KPI.
+vars:
+  health_score_criticality_weights:
+    LOW: 0.2
+    MEDIUM: 0.3
+    HIGH: 0.5
+  health_score_kpi_weights:
+    otd: 0.4
+    ppm: 0.4
+    lead_time: 0.2
