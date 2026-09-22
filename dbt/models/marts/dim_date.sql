@@ -14,6 +14,7 @@ SELECT
     EXTRACT(QUARTER FROM date_day) AS quarter,
     EXTRACT(MONTH FROM date_day) AS month,
     TO_CHAR(date_day, 'Month') AS month_name,
+    DATE_TRUNC('month', date_day)::date AS month_start_date,
     EXTRACT(WEEK FROM date_day) AS week_of_year,
     EXTRACT(DOW FROM date_day) AS day_of_week,
     TO_CHAR(date_day, 'Day') AS day_name,
