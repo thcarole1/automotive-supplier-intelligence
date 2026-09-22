@@ -46,3 +46,6 @@ vars:
     otd: 0.4
     ppm: 0.4
     lead_time: 0.2
+  # Fenêtre récente (en jours) utilisée pour calculer la consommation
+  # moyenne dans kpi_part_days_of_supply, plutôt que sur tout l'historique.
+  days_of_supply_window_days: 90

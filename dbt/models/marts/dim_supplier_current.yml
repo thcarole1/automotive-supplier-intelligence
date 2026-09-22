@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: dim_supplier_current
+    description: >
+      Version courante de chaque fournisseur, une ligne par supplier_id.
+      Sert de pivot pour relier les KPI (déjà au grain "un par fournisseur")
+      dans Power BI, sans les ambiguïtés introduites par les multiples
+      versions SCD2 de dim_supplier.
+    columns:
+      - name: supplier_id
+        description: Identifiant du fournisseur, clé unique de cette table.
+        tests:
+          - not_null
+          - unique
