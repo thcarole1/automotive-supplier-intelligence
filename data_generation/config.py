@@ -84,6 +84,6 @@ SEVERITY_WEIGHTS = OrderedDict([
 QUANTITY_AFFECTED_RATIO_RANGE = (0.05, 0.40)  # part de la quantité livrée touchée
 
 # Simulation du stock (inventory_snapshots)
-DAILY_CONSUMPTION_RANGE = (2, 15)   # unités consommées par jour, tirées une fois par pièce
+DAILY_CONSUMPTION_JITTER_RANGE = (0.85, 1.15)  # variabilité autour de la consommation réelle dérivée des livraisons
 SAFETY_STOCK_DAYS_COVERAGE = 10     # safety_stock = consommation_quotidienne x ce nombre de jours
 INITIAL_STOCK_DAYS_COVERAGE = 15    # stock de départ = consommation_quotidienne x ce nombre de jours
