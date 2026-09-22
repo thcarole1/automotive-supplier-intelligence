@@ -135,6 +135,14 @@ flowchart TD
     class C1,D resultStyle
 ```
 
+## Orchestration Airflow
+
+Un DAG unique (`asip_pipeline`) orchestre le pipeline de bout en bout : génération/ingestion des données, `dbt run`, `dbt test`, puis publication d'un résumé des KPI dans les logs. Airflow tourne en local via Docker (image versionnée, LocalExecutor, base de métadonnées dédiée).
+
+Exécution réelle du DAG, les 4 tâches en succès :
+
+![Graphe du DAG Airflow](docs/img/airflow-dag-graph.png)
+
 ## Stack
 
 
