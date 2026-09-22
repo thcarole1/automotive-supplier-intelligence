@@ -36,11 +36,12 @@ Anomalies injectées volontairement (~4 % du volume) : doublons fournisseurs, va
 
 ## Modèle de données (star schema)
 
-3 dimensions (dont `dim_supplier` avec historisation SCD2) et 4 tables de faits, obtenues via un pipeline dbt en 3 couches (staging → intermediate → marts).
+4 dimensions (dont `dim_supplier` avec historisation SCD2 et `dim_supplier_current`, sa version courante utilisée comme pivot) et 4 tables de faits, obtenues via un pipeline dbt en 3 couches (staging → intermediate → marts).
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#e3f2fd', 'primaryTextColor': '#0d1b2a', 'primaryBorderColor': '#1565c0', 'lineColor': '#333333', 'tertiaryColor': '#fff3e0'}}}%%
 erDiagram
+    dim_supplier_current ||--o{ dim_supplier : "supplier_id"
     dim_supplier ||--o{ fct_purchase_order_line : "supplier_key"
     dim_supplier ||--o{ fct_delivery : "supplier_key"
     dim_supplier ||--o{ fct_quality_incident : "supplier_key"
@@ -51,6 +52,10 @@ erDiagram
     dim_date ||--o{ fct_purchase_order_line : "order_date"
     dim_date ||--o{ fct_inventory_snapshot : "snapshot_date"
 
+    dim_supplier_current {
+        int supplier_id PK
+        string risk_profile
+    }
     dim_supplier {
         string supplier_key PK
         int supplier_id
@@ -90,7 +95,7 @@ erDiagram
     }
 ```
 
-`supplier_key` (et non `supplier_id`) est utilisé comme clé étrangère dans les faits : c'est la clé de version SCD2, qui pointe vers la version du fournisseur active à la date du fait (voir [ADR-0004](docs/adr/0004-fallback-scd2-facts.md)).
+`supplier_key` (et non `supplier_id`) est utilisé comme clé étrangère dans les faits : c'est la clé de version SCD2, qui pointe vers la version du fournisseur active à la date du fait (voir [ADR-0004](docs/adr/0004-fallback-scd2-facts.md)). `dim_supplier_current` ne garde qu'une ligne par fournisseur (version actuelle) : elle sert de pivot vers les tables de KPI (déjà au grain "un par fournisseur"), notamment dans Power BI, où une relation directe depuis `dim_supplier` aurait été ambiguë du fait des versions multiples.
 
 ### Documentation dbt et graphe de lignage
 
@@ -102,7 +107,7 @@ dbt docs generate
 dbt docs serve
 ```
 
-Le graphe de lignage réel du projet (généré à partir des 15 modèles et de leurs dépendances) :
+Le graphe de lignage réel du projet (généré à partir des 21 modèles et de leurs dépendances) :
 
 ![Graphe de lignage dbt](docs/img/dbt-lineage-graph.png)
 
@@ -142,6 +147,18 @@ Un DAG unique (`asip_pipeline`) orchestre le pipeline de bout en bout : généra
 Exécution réelle du DAG, les 4 tâches en succès :
 
 ![Graphe du DAG Airflow](docs/img/airflow-dag-graph.png)
+
+## Dashboard Power BI
+
+Connexion directe à PostgreSQL (DirectQuery, pas d'import), 2 pages conformes au cahier des charges.
+
+**Executive** : répartition des fournisseurs par profil de risque, OTD/PPM/lead time/Days of Supply moyens.
+
+![Page Executive](docs/img/powerbi-executive.png)
+
+**Fournisseur** : drill-down par fournisseur (sélecteur), Health Score, profil de risque, et historique mensuel OTD/PPM/lead time.
+
+![Page Fournisseur](docs/img/powerbi-supplier.png)
 
 ## Stack
 
