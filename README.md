@@ -176,13 +176,31 @@ Connexion directe à PostgreSQL (DirectQuery, pas d'import), 2 pages conformes a
 ```bash
 git clone <repo>
 cd automotive-supplier-intelligence
-docker compose up
+cp .env.example .env
 ```
+
+Complète `.env` avec tes propres valeurs (mots de passe locaux, et une clé Fernet Airflow générée via `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`).
+
+```bash
+docker compose up -d --build
+```
+
+Le pipeline peut ensuite être déclenché de deux façons :
+
+- **Via Airflow** (recommandé) : ouvre `http://localhost:8081` (identifiants `AIRFLOW_ADMIN_USER`/`AIRFLOW_ADMIN_PASSWORD` de ton `.env`), déclenche le DAG `asip_pipeline`.
+- **En local, manuellement** : depuis un environnement virtuel Python avec `pip install -r requirements.txt`, puis :
+  ```bash
+  python -m data_generation.generate
+  cd dbt && export DBT_PROFILES_DIR=$(pwd) && dbt run && dbt test
+  ```
+
+Le dashboard Power BI (`.pbix`, non versionné) se connecte ensuite à `localhost:5432` (base `asip`, schéma `dbt_dev`) en DirectQuery.
 
 ## État du projet
 
-- Phases terminées : 0/4
-- Tests dbt : 0
+- Phases terminées : 3/4 (générateur de données, socle dbt avec SCD2, KPI + orchestration Airflow + dashboard Power BI)
+- Modèles dbt : 21 (staging, intermediate, marts)
+- Tests dbt : 90 (89 passants, 1 avertissement documenté, voir la section Données générées)
 - ADR rédigés : 4
 
 ## Pistes d'extension (hors périmètre v1)
