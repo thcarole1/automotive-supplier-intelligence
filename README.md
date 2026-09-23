@@ -1,6 +1,23 @@
 # Automotive Supplier Intelligence Platform (ASIP)
 
-> ⚠️ Projet en cours de construction. Ce README sera mis à jour à chaque clôture de phase.
+*Socle Data Engineering terminé (générateur, dbt, KPI, Airflow, Power BI). Phase bonus Machine Learning non démarrée.*
+
+## Sommaire
+
+- [En bref](#en-bref)
+- [Comprendre ce projet en 2 minutes](#comprendre-ce-projet-en-2-minutes-sans-jargon-technique)
+- [Schéma d'architecture](#schéma-darchitecture)
+- [Données générées](#données-générées)
+- [Modèle de données (star schema)](#modèle-de-données-star-schema)
+- [KPI calculés](#kpi-calculés)
+- [Orchestration Airflow](#orchestration-airflow)
+- [Dashboard Power BI](#dashboard-power-bi)
+- [Le chantier le plus formateur](#le-chantier-le-plus-formateur--la-dérive-du-days-of-supply)
+- [Stack](#stack)
+- [Démarrage](#démarrage)
+- [État du projet](#état-du-projet)
+- [Pistes d'extension](#pistes-dextension-hors-périmètre-v1)
+- [Documentation approfondie](#documentation-approfondie)
 
 ## En bref
 
@@ -190,12 +207,14 @@ Ce que je retiens de ce chantier : vérifier une hypothèse avec une vraie requ�
 
 ## Stack
 
-
-- **Génération de données** : Python, Faker (seed fixe, reproductible)
-- **Stockage** : PostgreSQL (Docker)
-- **Transformation** : dbt (star schema, SCD2 sur `dim_supplier`)
-- **Orchestration** : Airflow (Docker, image versionnée)
-- **Restitution** : Power BI
+| Domaine | Outils | Statut |
+|---|---|---|
+| Génération de données | Python, Faker (seed fixe, reproductible) | Fait |
+| Stockage | PostgreSQL (Docker) | Fait |
+| Transformation | dbt (star schema, SCD2 sur `dim_supplier`) | Fait |
+| Orchestration | Airflow (Docker, image versionnée) | Fait |
+| Restitution | Power BI | Fait |
+| Machine Learning | Baseline + régression logistique | À faire (bonus) |
 
 *(Volet cloud AWS explicitement hors périmètre v1, voir [ADR-0001](docs/adr/0001-postgres-local-vs-cloud-demblee.md))*
 
@@ -230,6 +249,13 @@ Le dashboard Power BI (`.pbix`, non versionné) se connecte ensuite à `localhos
 - Modèles dbt : 21 (staging, intermediate, marts)
 - Tests dbt : 90 (89 passants, 1 avertissement documenté, voir la section Données générées)
 - ADR rédigés : 4
+
+## Prochaines étapes
+
+- ✅ **Semaine 1** : générateur de données, relations causales, anomalies volontaires
+- ✅ **Semaine 2** : PostgreSQL, socle dbt (staging/intermediate/marts), SCD2 sur `dim_supplier`, tests
+- ✅ **Semaine 3** : 5 KPI dont Supplier Health Score, orchestration Airflow, dashboard Power BI 2 pages
+- ⬜ **Semaine 4 (bonus)** : baseline règle métier, régression logistique, validation temporelle
 
 ## Pistes d'extension (hors périmètre v1)
 
