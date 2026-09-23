@@ -131,7 +131,7 @@ erDiagram
     }
 ```
 
-`supplier_key` (not `supplier_id`) is used as the foreign key in the fact tables: it's the SCD2 version key, pointing to the supplier version that was active at the fact's date (see [ADR-0004](docs/adr/0004-fallback-scd2-facts.md), in French). `dim_supplier_current` keeps only one row per supplier (current version): it acts as a pivot toward the KPI tables (already at the "one per supplier" grain), notably in Power BI, where a direct relationship from `dim_supplier` would have been ambiguous due to multiple versions.
+`supplier_key` (not `supplier_id`) is used as the foreign key in the fact tables: it's the SCD2 version key, pointing to the supplier version that was active at the fact's date (see [ADR-0004](docs/adr/0004-fallback-scd2-facts.en.md)). `dim_supplier_current` keeps only one row per supplier (current version): it acts as a pivot toward the KPI tables (already at the "one per supplier" grain), notably in Power BI, where a direct relationship from `dim_supplier` would have been ambiguous due to multiple versions.
 
 ### dbt documentation and lineage graph
 
@@ -219,7 +219,7 @@ What I take away from this: verify a hypothesis with a real SQL query before con
 | Reporting | Power BI | Done |
 | Machine Learning | Rule-based baseline + logistic regression | To do (bonus) |
 
-*(AWS cloud track explicitly out of scope for v1, see [ADR-0001](docs/adr/0001-postgres-local-vs-cloud-demblee.md), in French)*
+*(AWS cloud track explicitly out of scope for v1, see [ADR-0001](docs/adr/0001-postgres-local-vs-cloud-demblee.en.md))*
 
 ## Getting started
 
@@ -263,12 +263,12 @@ The Power BI dashboard (`.pbix`, not version-controlled) then connects to `local
 ## Extension ideas (out of scope for v1)
 
 - **Multi-plant consumption by country**: the current stock model simulates a single global daily consumption per part, with no geographic breakdown. A more realistic evolution would split consumption across several plants in different countries, each with its own pace. This would require introducing a plant entity, currently absent from the source data.
-- **dim_plant**: initially planned in the requirements, this dimension was removed from the v1 scope, for lack of a source table carrying a plant concept (see [ADR-0003](docs/adr/0003-retrait-dim-plant.md), in French). It could come back if the multi-plant idea above is implemented.
-- **SCD2 history on the facts**: `dim_supplier`'s SCD2 was only activated after the initial data generation (2023-2025), so historical facts all reference the supplier's current version rather than the one in effect at their actual date (see [ADR-0004](docs/adr/0004-fallback-scd2-facts.md), in French). A new fact generated after a `risk_profile` change will benefit from an exact temporal match.
+- **dim_plant**: initially planned in the requirements, this dimension was removed from the v1 scope, for lack of a source table carrying a plant concept (see [ADR-0003](docs/adr/0003-retrait-dim-plant.en.md)). It could come back if the multi-plant idea above is implemented.
+- **SCD2 history on the facts**: `dim_supplier`'s SCD2 was only activated after the initial data generation (2023-2025), so historical facts all reference the supplier's current version rather than the one in effect at their actual date (see [ADR-0004](docs/adr/0004-fallback-scd2-facts.en.md)). A new fact generated after a `risk_profile` change will benefit from an exact temporal match.
 
 ## Further documentation
 
-- [ADR-0001: Choosing local PostgreSQL over a cloud setup from the start](docs/adr/0001-postgres-local-vs-cloud-demblee.md) (in French)
-- [ADR-0002: Deliberately minimal 6-table scope](docs/adr/0002-perimetre-six-tables.md) (in French)
-- [ADR-0003: Removing dim_plant from the v1 scope](docs/adr/0003-retrait-dim-plant.md) (in French)
-- [ADR-0004: Falling back to the current version for the SCD2 temporal join](docs/adr/0004-fallback-scd2-facts.md) (in French)
+- [ADR-0001: Choosing local PostgreSQL over a cloud setup from the start](docs/adr/0001-postgres-local-vs-cloud-demblee.en.md)
+- [ADR-0002: Deliberately minimal 6-table scope](docs/adr/0002-perimetre-six-tables.en.md)
+- [ADR-0003: Removing dim_plant from the v1 scope](docs/adr/0003-retrait-dim-plant.en.md)
+- [ADR-0004: Falling back to the current version for the SCD2 temporal join](docs/adr/0004-fallback-scd2-facts.en.md)
