@@ -1,5 +1,7 @@
 # Automotive Supplier Intelligence Platform (ASIP)
 
+🇫🇷 Français | [🇬🇧 English](README.en.md)
+
 *Socle Data Engineering terminé (générateur, dbt, KPI, Airflow, Power BI). Phase bonus Machine Learning non démarrée.*
 
 ## Sommaire
