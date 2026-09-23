@@ -8,6 +8,22 @@ Plateforme d'intelligence fournisseurs pour une entreprise automobile fictive (*
 
 Les données et le nom de l'entreprise sont **entièrement fictifs**, sans lien avec des données confidentielles d'un employeur réel.
 
+## Comprendre ce projet en 2 minutes (sans jargon technique)
+
+**Le problème que ce projet résout** : dans une entreprise automobile, savoir en temps réel si un fournisseur livre en retard, si ses pièces ont des défauts, ou si un stock risque de manquer, demande normalement de croiser plusieurs tableurs à la main. Ce projet automatise tout ça, de la donnée brute jusqu'à un tableau de bord consultable en un coup d'œil.
+
+**Ce qu'il fait, concrètement, à chaque exécution, sans intervention humaine :**
+
+1. Il génère un jeu de données réaliste (fournisseurs, commandes, livraisons, incidents qualité, niveaux de stock), avec volontairement quelques erreurs glissées dedans, comme dans un vrai système d'entreprise
+2. Il nettoie, transforme et vérifie ces données automatiquement (près de 90 contrôles de qualité)
+3. Il calcule des indicateurs métier : un fournisseur livre-t-il à l'heure ? A-t-il beaucoup de pièces défectueuses ? Un stock risque-t-il la rupture ? Et un score de fiabilité global par fournisseur, pondéré selon l'importance des pièces concernées
+4. Tout ce travail est orchestré automatiquement (génération, transformation, vérification), sans étape manuelle
+5. Les résultats sont ensuite consultables dans un tableau de bord visuel, avec la possibilité de zoomer sur un fournisseur précis et voir son évolution dans le temps
+
+**Pourquoi c'est exactement le métier de Data Engineer** : une entreprise n'a pas besoin de données brutes, elle a besoin de données fiables, vérifiées, et transformées en indicateurs sur lesquels elle peut agir. C'est précisément ce que ce projet démontre.
+
+**Le lien avec mon parcours** : après plus de 10 ans dans l'industrie automobile, dont plusieurs années aux achats de composants (portefeuille de plus de 100 millions d'euros), j'ai voulu construire un projet directement ancré dans cette expérience : le suivi de la performance fournisseurs, un sujet que je connaissais déjà côté métier, abordé ici côté données.
+
 ## Schéma d'architecture
 
 ```mermaid
@@ -159,6 +175,18 @@ Connexion directe à PostgreSQL (DirectQuery, pas d'import), 2 pages conformes a
 **Fournisseur** : drill-down par fournisseur (sélecteur), Health Score, profil de risque, et historique mensuel OTD/PPM/lead time.
 
 ![Page Fournisseur](docs/img/powerbi-supplier.png)
+
+## Le chantier le plus formateur : la dérive du Days of Supply
+
+En construisant le dashboard Power BI, une valeur m'a sauté aux yeux : un Days of Supply moyen de **915 jours** sur certaines pièces. Le générateur de données visait pourtant une couverture de stock d'environ 15 jours. Plutôt que de bidouiller le chiffre, j'ai cherché la vraie cause. Il m'a fallu trois allers-retours.
+
+**Premier problème trouvé : la consommation journalière n'avait aucun lien avec les commandes réelles.** Le générateur tirait un chiffre au hasard (2 à 15 unités par jour), pendant que les commandes livraient parfois jusqu'à 500 unités d'un coup. J'ai corrigé ça en calculant la consommation à partir du volume vraiment livré à chaque pièce. Résultat : la valeur descend à ~350 jours. Mieux, mais toujours pas bon.
+
+**Deuxième problème, plus caché : le stock partait de trop bas et n'arrivait jamais à se stabiliser.** En tout début de simulation, le stock initial (15 jours de couverture) s'épuisait avant même la première grosse livraison. Mon code plafonnait alors le stock à 0, ce qui effaçait silencieusement de la consommation. Pendant ce temps, chaque livraison continuait d'ajouter son montant complet. Sur 3 ans, ce déséquilibre s'accumulait sans jamais se corriger tout seul. J'ai résolu ça en suivant un stock "théorique" en interne, qui peut descendre sous 0 (ça représente une rupture, une pratique courante en simulation de stock), et je n'affiche que sa version plafonnée à 0. Résultat : la moyenne tombe à 3.2 jours, enfin cohérent.
+
+**Troisième problème, découvert juste après, sur un tout autre KPI : le PPM affichait des pics jusqu'à 10 millions dans Power BI.** En cherchant, j'ai vu que la table des incidents qualité n'était reliée à aucune date dans le modèle Power BI. Du coup, filtrer par mois réduisait bien le nombre de livraisons (le dénominateur), mais pas le nombre d'incidents (le numérateur), qui restait celui de 3 années entières. J'ai ajouté la relation manquante, puis une vraie colonne de regroupement mensuel dans `dim_date`, parce que regrouper jour par jour donnait des ratios instables sur de petits volumes.
+
+Ce que je retiens de ce chantier : vérifier une hypothèse avec une vraie requête SQL avant de conclure quoi que ce soit, accepter qu'une première correction ne suffise pas toujours, et apprendre à distinguer un vrai bug d'un phénomène statistique normal.
 
 ## Stack
 
